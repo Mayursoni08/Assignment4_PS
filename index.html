@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferranti Effect — 220 kV, 200 km Line | EE 315</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:        #0B1420;
+    --panel:     #101C2C;
+    --panel-2:   #0E1826;
+    --line:      #1F3247;
+    --text:      #E7EDF3;
+    --muted:     #8CA0B4;
+    --amber:     #E8A33D;
+    --amber-dim: #7A5A26;
+    --teal:      #57B8B0;
+    --danger:    #D9684F;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk',sans-serif;
+    line-height:1.55;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:var(--amber);}
+  .wrap{max-width:960px;margin:0 auto;padding:0 28px;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding:18px 0;
+    position:sticky;top:0;background:rgba(11,20,32,0.92);backdrop-filter:blur(6px);
+    z-index:10;
+  }
+  header.top .wrap{display:flex;justify-content:space-between;align-items:center;}
+  .brand{font-weight:600;font-size:15px;letter-spacing:0.02em;}
+  .brand span{color:var(--amber);}
+  nav a{color:var(--muted);text-decoration:none;font-size:14px;margin-left:22px;}
+  nav a:hover{color:var(--text);}
+
+  /* HERO */
+  .hero{padding:76px 0 40px;position:relative;overflow:hidden;}
+  .hero .wrap{position:relative;z-index:2;}
+  .eyebrow-line{
+    display:flex;align-items:center;gap:10px;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;margin-bottom:22px;
+  }
+  .eyebrow-line .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);}
+  h1{
+    font-size:44px;line-height:1.12;margin:0 0 18px;font-weight:600;
+    max-width:15ch;
+  }
+  h1 em{font-style:normal;color:var(--amber);}
+  .hero p.lead{color:var(--muted);font-size:17px;max-width:56ch;margin:0 0 36px;}
+
+  .waveform{width:100%;height:auto;display:block;margin:8px 0 30px;}
+  .waveform .grid-line{stroke:var(--line);stroke-width:1;}
+  .waveform .vs{stroke:var(--teal);stroke-width:2.5;fill:none;}
+  .waveform .vr{stroke:var(--amber);stroke-width:2.5;fill:none;}
+  .wf-legend{display:flex;gap:26px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);margin-top:-14px;}
+  .wf-legend .sw{display:inline-block;width:14px;height:2px;margin-right:8px;vertical-align:middle;}
+
+  .stat-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;}
+  .stat{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:18px 20px;min-width:180px;flex:1;
+  }
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;}
+  .stat .num.up{color:var(--danger);}
+  .stat .num.down{color:var(--teal);}
+  .stat .lbl{color:var(--muted);font-size:13px;margin-top:4px;}
+
+  section{padding:52px 0;border-top:1px solid var(--line);}
+  h2{font-size:24px;font-weight:600;margin:0 0 8px;}
+  h2 .idx{font-family:'IBM Plex Mono',monospace;color:var(--amber-dim);font-size:15px;margin-right:10px;}
+  .section-sub{color:var(--muted);font-size:15px;max-width:60ch;margin:0 0 28px;}
+
+  table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-transform:none;}
+  td.mono, th.mono{font-family:'IBM Plex Mono',monospace;}
+
+  .formula{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+    padding:18px 22px;font-family:'IBM Plex Mono',monospace;font-size:15px;
+    color:var(--text);margin:14px 0;overflow-x:auto;
+  }
+  .formula .r{color:var(--amber);}
+
+  .two-col{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:start;}
+  @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+
+  .diagram-frame{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px;
+  }
+  .diagram-frame img{width:100%;display:block;border-radius:6px;}
+  .caption{color:var(--muted);font-size:13px;margin-top:10px;}
+
+  .bars{display:flex;flex-direction:column;gap:14px;margin-top:10px;}
+  .bar-row{display:grid;grid-template-columns:150px 1fr 70px;gap:12px;align-items:center;font-size:13.5px;}
+  .bar-track{height:10px;background:var(--panel-2);border-radius:5px;position:relative;overflow:visible;border:1px solid var(--line);}
+  .bar-fill{position:absolute;top:-1px;bottom:-1px;border-radius:5px;}
+  .bar-fill.base{background:var(--muted);opacity:.5;}
+  .bar-fill.up{background:var(--danger);}
+  .bar-fill.down{background:var(--teal);}
+  .bar-val{font-family:'IBM Plex Mono',monospace;text-align:right;}
+
+  .filelist{list-style:none;padding:0;margin:0;}
+  .filelist li{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .filelist li:last-child{border-bottom:none;}
+  .filelist .fname{font-family:'IBM Plex Mono',monospace;font-size:14.5px;}
+  .filelist .fdesc{color:var(--muted);font-size:13.5px;}
+  .filelist a.dl{color:var(--amber);text-decoration:none;font-size:13.5px;white-space:nowrap;margin-left:16px;}
+
+  .team{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+  .chip{
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+    font-size:13.5px;color:var(--muted);
+  }
+  .chip.lead{border-color:var(--amber-dim);color:var(--amber);}
+
+  footer{padding:34px 0 60px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">EE 315 <span>/</span> Assignment 4</div>
+    <nav>
+      <a href="#theory">Theory</a>
+      <a href="#model">Model</a>
+      <a href="#results">Results</a>
+      <a href="#files">Files</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow-line"><span class="dot"></span> 220 kV &nbsp;·&nbsp; 50 Hz &nbsp;·&nbsp; 200 km line</div>
+    <h1>Why a light-loaded line raises its own <em>receiving-end voltage</em></h1>
+    <p class="lead">
+      A Simulink model of a 220&nbsp;kV, 200&nbsp;km transmission line, built to
+      demonstrate the Ferranti effect under light-load conditions — and a shunt
+      reactor sized and tested to pull the overvoltage back down.
+    </p>
+
+    <svg class="waveform" viewBox="0 0 900 180" preserveAspectRatio="none">
+      <line class="grid-line" x1="0" y1="90" x2="900" y2="90"></line>
+      <path class="vs" d="M0,90 C25,40 50,40 75,90 C100,140 125,140 150,90 C175,40 200,40 225,90 C250,140 275,140 300,90 C325,40 350,40 375,90 C400,140 425,140 450,90 C475,40 500,40 525,90 C550,140 575,140 600,90 C625,40 650,40 675,90 C700,140 725,140 750,90 C775,40 800,40 825,90 C850,140 875,140 900,90"></path>
+      <path class="vr" d="M0,90 C25,32 50,32 75,90 C100,148 125,148 150,90 C175,32 200,32 225,90 C250,148 275,148 300,90 C325,32 350,32 375,90 C400,148 425,148 450,90 C475,32 500,32 525,90 C550,148 575,148 600,90 C625,32 650,32 675,90 C700,148 725,148 750,90 C775,32 800,32 825,90 C850,148 875,148 900,90"></path>
+    </svg>
+    <div class="wf-legend">
+      <span><span class="sw" style="background:var(--teal);"></span>Sending-end voltage V<sub>S</sub></span>
+      <span><span class="sw" style="background:var(--amber);"></span>Receiving-end voltage V<sub>R</sub> (uncompensated)</span>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num up">+2.16%</div>
+        <div class="lbl">Receiving-end rise, reactor off (simulated)</div>
+      </div>
+      <div class="stat">
+        <div class="num">+2.01%</div>
+        <div class="lbl">Theoretical rise, ABCD parameters</div>
+      </div>
+      <div class="stat">
+        <div class="num down">−1.46%</div>
+        <div class="lbl">Receiving-end change, reactor on</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="theory">
+  <div class="wrap">
+    <h2><span class="idx">01</span>Why it happens</h2>
+    <p class="section-sub">
+      A long line's distributed shunt capacitance draws a leading charging
+      current. At light load, that current has nowhere else to go — it flows
+      back through the line's own series reactance and lifts the receiving-end
+      voltage above the sending end.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="formula">
+          Z = R + jX<sub class="r">L</sub> = 10 + j62.83 &Omega;<br>
+          Y = j&omega;C = j6.283&times;10<sup class="r">-4</sup> S<br>
+          A = 1 + ZY/2 = <span class="r">0.9803&ang;0.18&deg;</span>
+        </div>
+        <div class="formula">
+          |V<sub>R</sub> / V<sub>S</sub>| = 1 / |A| = <span class="r">1.0201</span>
+        </div>
+      </div>
+      <div>
+        <table>
+          <tr><th>Parameter</th><th class="mono">Value</th></tr>
+          <tr><td>Series resistance</td><td class="mono">0.05 &Omega;/km/phase</td></tr>
+          <tr><td>Series inductance</td><td class="mono">1 mH/km/phase</td></tr>
+          <tr><td>Shunt capacitance</td><td class="mono">0.01 &micro;F/km/phase</td></tr>
+          <tr><td>Line length</td><td class="mono">200 km</td></tr>
+          <tr><td>Total R / L / C</td><td class="mono">10 &Omega; / 0.2 H / 2 &micro;F</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="model">
+  <div class="wrap">
+    <h2><span class="idx">02</span>The model</h2>
+    <p class="section-sub">
+      Built entirely from a MATLAB script (Simscape Electrical Foundation
+      Library) rather than drawn by hand, so it's reproducible and
+      version-controlled — see <code class="mono">assignment4.m</code>
+      in the repo.
+    </p>
+    <div class="diagram-frame">
+      <img src="model_diagram.png" alt="Simulink model diagram of the 200 km transmission line">
+    </div>
+    <p class="caption">Source &rarr; series R–L line &rarr; receiving node, with shunt capacitances at both ends, a light load, and a switchable shunt reactor for mitigation.</p>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2><span class="idx">03</span>Results</h2>
+    <p class="section-sub">
+      Peak receiving-end voltage relative to the sending end, across all three
+      conditions.
+    </p>
+
+    <div class="bars">
+      <div class="bar-row">
+        <div>Theoretical (ABCD)</div>
+        <div class="bar-track"><div class="bar-fill up" style="left:50%;width:20%;"></div></div>
+        <div class="bar-val">+2.01%</div>
+      </div>
+      <div class="bar-row">
+        <div>Simulated, reactor off</div>
+        <div class="bar-track"><div class="bar-fill up" style="left:50%;width:21.6%;"></div></div>
+        <div class="bar-val">+2.16%</div>
+      </div>
+      <div class="bar-row">
+        <div>Simulated, reactor on</div>
+        <div class="bar-track"><div class="bar-fill down" style="right:50%;width:14.6%;"></div></div>
+        <div class="bar-val">−1.46%</div>
+      </div>
+    </div>
+
+    <table style="margin-top:34px;">
+      <tr><th>Condition</th><th class="mono">V_S (kV, LL)</th><th class="mono">V_R (kV, LL)</th><th class="mono">Change</th></tr>
+      <tr><td>Theoretical, no load</td><td class="mono">220.0</td><td class="mono">224.4</td><td class="mono">+2.01%</td></tr>
+      <tr><td>Simulated, reactor off</td><td class="mono">220.0</td><td class="mono">224.75</td><td class="mono">+2.16%</td></tr>
+      <tr><td>Simulated, reactor on</td><td class="mono">220.0</td><td class="mono">216.76</td><td class="mono">−1.46%</td></tr>
+    </table>
+
+    <p class="section-sub" style="margin-top:26px;">
+      A ~30.4 MVAr shunt reactor, switched in at t&nbsp;=&nbsp;0.1s, absorbs the
+      line's own charging current and pulls the receiving-end voltage back down
+      — slightly past the sending-end value, suggesting the reactor is a touch
+      oversized for this particular load level. In practice, reactors are
+      switched in discrete banks to allow finer tuning across varying loads.
+    </p>
+  </div>
+</section>
+
+<section id="files">
+  <div class="wrap">
+    <h2><span class="idx">04</span>Files</h2>
+    <ul class="filelist">
+      <li>
+        <div>
+          <div class="fname">assignment4.m</div>
+          <div class="fdesc">MATLAB script that builds and wires the Simulink model</div>
+        </div>
+        <a class="dl" href="assignment4.m">View &rarr;</a>
+      </li>
+      <li>
+        <div>
+          <div class="fname">model.slx</div>
+          <div class="fdesc">The Simulink model</div>
+        </div>
+        <a class="dl" href="model.slx">Download &rarr;</a>
+      </li>
+      <li>
+        <div>
+          <div class="fname">report.pdf</div>
+          <div class="fdesc">Full write-up with theory, derivation, and results</div>
+        </div>
+        <a class="dl" href="report.pdf">View &rarr;</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap">
+    <h2><span class="idx">05</span>Group 04</h2>
+    <div class="team">
+      <span class="chip lead">Mayur Soni · 240002037 · Lead</span>
+      <span class="chip">Akarsh J · 240002007</span>
+      <span class="chip">Sreehari · 240002073</span>
+      <span class="chip">Naman V Shetty · 240002043</span>
+      <span class="chip">Bhasuru Nikhil · 240002017</span>
+      <span class="chip">Ridhi Shakkar · 240002069</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    EE 315 Power Systems &middot; Assignment 4 &middot; <a href="https://github.com/Mayursoni08/Assignment4_PS">GitHub repository</a>
+  </div>
+</footer>
+
+</body>
+</html>
